@@ -1,0 +1,16 @@
+# Node & React
+node_modules/
+dist/
+npm-debug.log*
+
+# Python
+__pycache__/
+venv/
+env/
+*.pyc
+
+# Database Secrets & Environment Variables
+.env
+
+# OS Files
+.DS_Store

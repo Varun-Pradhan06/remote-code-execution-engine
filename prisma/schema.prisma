@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  password_hash String
+  created_at    DateTime     @default(now())
+  
+  submissions   Submission[] 
+}
+
+model Submission {
+  id                String   @id @default(uuid())
+  userId            String   
+  source_code       String   @db.Text
+  language          String
+  status            String
+  predicted_o_n     String?  
+  execution_time_ms Int?     
+  created_at        DateTime @default(now())
+
+  user              User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, language, status]) 
+}
