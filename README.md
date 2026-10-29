@@ -1,5 +1,7 @@
 # ⚡ Distributed Code Execution Sandbox & Analysis Engine
 
+![Big-O Sandbox Interface](assets/ui-showcase.png)
+
 A full-stack, distributed microservice architecture that securely executes untrusted user code in isolated ephemeral containers while predicting its Big-O Time Complexity using a machine learning worker.
 
 ## 🏗️ System Architecture & Engineering Decisions
