@@ -50,8 +50,9 @@ app.post('/api/users', async (req, res) => {
 app.post('/api/execute', async (req, res) => {
     const { code, language, userId } = req.body;
     
-    if (language !== 'cpp') {
-        return res.status(400).json({ error: "Only C++ is supported right now" });
+    // 1. Support both C++ and Python
+    if (language !== 'cpp' && language !== 'python') {
+        return res.status(400).json({ error: "Unsupported language. Use 'cpp' or 'python'." });
     }
     if (!userId) {
         return res.status(400).json({ error: "userId is required to track the submission" });
@@ -68,17 +69,20 @@ app.post('/api/execute', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error(error);
+        console.error("Database error:", error);
         return res.status(500).json({ error: "Failed to create submission record" });
     }
 
-    const filename = `temp_${Date.now()}.cpp`;
-    
-    // Convert the code to a Base64 string to safely pass it via command line
     const base64Code = Buffer.from(code).toString('base64');
-    
-    // Pass the encoded string, decode it inside the container, compile, and run
-    const command = `docker run --rm gcc:latest bash -c "echo '${base64Code}' | base64 -d > temp.cpp && g++ temp.cpp -o a.out && ./a.out"`;
+    let command = "";
+
+    // 2. Dynamically assign the Docker execution command
+    if (language === 'cpp') {
+        command = `docker run --rm gcc:latest bash -c "echo '${base64Code}' | base64 -d > temp.cpp && g++ temp.cpp -o a.out && ./a.out"`;
+    } else if (language === 'python') {
+        // We use python:3.10-slim for significantly faster container boot times
+        command = `docker run --rm python:3.10-slim bash -c "echo '${base64Code}' | base64 -d > temp.py && python3 temp.py"`;
+    }
 
     const startTime = Date.now();
 
